@@ -4,8 +4,7 @@ import pyautogui
 
 mouse = pyautogui
 
-x, y = pyautogui.size()
-
+width, height = mouse.size()
 
 
 mp_drawing = mp.solutions.drawing_utils
@@ -15,9 +14,10 @@ hands = mp_hands.Hands(
     min_detection_confidence=0.7, min_tracking_confidence=0.7, max_num_hands=2)
 cap = cv2.VideoCapture(0)
 while cap.isOpened():
-  width  = x#cap.get(3) # float
-  height = y#cap.get(4)
   success, image = cap.read()
+  image = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+
+    
   if not success:
     print("Ignoring empty camera frame.")
     # If loading a video, use 'break' instead of 'continue'.
@@ -44,15 +44,7 @@ while cap.isOpened():
         left = 0
     for hand_landmarks in results.multi_hand_landmarks:
       counter = counter + 1
-      #if(len(results.multi_handedness) > 1):
-        #temp2 = results.multi_handedness[1]
-        #if(temp2.classification[0].label == "Left"):
-          #print("STONKS")
-          #print(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width)
-         #         
-      #if(temp.classification[0].label == "Right"):
-       # print("GOTTEM")
-        #print(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width)
+      
       if(counter%2==right):
         mouse.moveTo(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width, hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].y * height, _pause = False)
       mp_drawing.draw_landmarks(
@@ -62,3 +54,15 @@ while cap.isOpened():
     break
 hands.close()
 cap.release()
+
+
+
+#if(len(results.multi_handedness) > 1):
+        #temp2 = results.multi_handedness[1]
+        #if(temp2.classification[0].label == "Left"):
+          #print("STONKS")
+          #print(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width)
+         #         
+      #if(temp.classification[0].label == "Right"):
+       # print("GOTTEM")
+        #print(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width)
