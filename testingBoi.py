@@ -87,7 +87,6 @@ image.flags.writeable = True
 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 
-process = threading.Thread(target = threadProcess)
 get = threading.Thread(target = threadGet)
 move = threading.Thread(target = threadMove)
 
