@@ -7,7 +7,6 @@ mouse = pyautogui
 
 width, height = mouse.size()
 
-
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 # For webcam input:
@@ -17,7 +16,6 @@ cap = cv2.VideoCapture(0)
 while cap.isOpened():
   success, image = cap.read()
   image = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
-
     
   if not success:
     print("Ignoring empty camera frame.")
@@ -68,12 +66,14 @@ while cap.isOpened():
         
       #left hand code (every alternate iteration)
       if(counter%2==left) :
-        if(abs(indexRX-thumbRX) < 0.02 and abs(indexRY-thumbRY) < 0.04) :
-          mouse.click(button = 'left')
+        if(abs(indexRX-thumbRX) < 0.02 and abs(indexRY-thumbRY) < 0.04):
+          mouse.mouseDown(button = 'left')
+        else :
+          mouse.mouseUp(button = 'left')
             
-      mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+      #mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
   
-  cv2.imshow('MediaPipe Hands', image)
+  #cv2.imshow('MediaPipe Hands', image)
   if cv2.waitKey(5) & 0xFF == 27:
     break
   
@@ -88,4 +88,4 @@ cap.release()
          #         
       #if(temp.classification[0].label == "Right"):
        # print("GOTTEM")
-        #print(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width)
+        #print(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width)  
