@@ -53,16 +53,11 @@ while cap.isOpened():
       middleRX = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].x
       middleRY = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y 
       middleRZ = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].z
-
-      # Wrist coords
-      wristX = hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x
-      wristY = hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].y
-      wristZ = hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].z
     
       #right hand code (every alternate iteration)
       if(counter%2==right):
-        if not stoptracking.stopTracking(middleRY, wristY):
-          mouse.moveTo(indexRX * width, indexRY * height, _pause = False)        
+        if not stoptracking.stopTracking(indexRY, indexRX, thumbRY, thumbRX):
+          mouse.moveTo(indexRX * width, indexRY * height, _pause = False)
         
       #left hand code (every alternate iteration)
       if(counter%2==left) :
@@ -70,6 +65,11 @@ while cap.isOpened():
           mouse.mouseDown(button = 'left')
         else :
           mouse.mouseUp(button = 'left')
+
+        if(abs(middleRX-thumbRX) < 0.02 and abs(middleRY-thumbRY) < 0.04):
+          mouse.mouseDown(button = 'right')
+        else :
+          mouse.mouseUp(button = 'right')
             
       #mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
   

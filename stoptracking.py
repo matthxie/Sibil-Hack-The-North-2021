@@ -1,3 +1,3 @@
-def stopTracking(middleY, wristY):
-    if (abs(middleY - wristY) < 0.2):
+def stopTracking(indexY, indexX, thumbY, thumbX):
+    if (abs(indexY - thumbY) < 0.15 and abs(indexX - thumbY) < 0.15):
         return True
