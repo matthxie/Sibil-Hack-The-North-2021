@@ -2,11 +2,15 @@ import cv2
 import mediapipe as mp
 import pyautogui
 import stoptracking
+import twofingerswiping
 
 mouse = pyautogui
 
 width, height = mouse.size()
 
+
+lastIndexX = 0
+lastIndexY = 0
 
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
@@ -58,15 +62,23 @@ while cap.isOpened():
     
       #right hand code (every alternate iteration)
       if(counter%2==right):
+        if twofingerswiping.scroll(middleRX, middleRY, indexRX, indexRY):
+          direction = (indexRY-lastIndexY)                
+          if(direction>0 and abs(direction) > 0.005):
+            pyautogui.scroll(10)   
+          elif abs(direction) > 0.005:
+            pyautogui.scroll(-10)
         if not stoptracking.stopTracking(indexRY, thumbRY):
-          mouse.moveTo(indexRX * width, indexRY * height, _pause = False)        
-        
+          mouse.moveTo(indexRX * width, indexRY * height, _pause = False)
+
       #left hand code (every alternate iteration)
       if(counter%2==left):
         if(abs(indexRX-thumbRX) < 0.02 and abs(indexRY-thumbRY) < 0.04):
           mouse.click(button = 'left')
             
       mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+      lastIndexX = indexRX
+      lastIndexY = indexRY
   
   cv2.imshow('MediaPipe Hands', image)
   if cv2.waitKey(5) & 0xFF == 27:
