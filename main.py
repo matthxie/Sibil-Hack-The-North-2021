@@ -1,25 +1,35 @@
 import cv2
 import mediapipe as mp
 import pyautogui
-import stoptracking
+import gestures
 
 mouse = pyautogui
 
 width, height = mouse.size()
 
+lastIndexX = 0
+lastIndexY = 0
+
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
+
 # For webcam input:
 hands = mp_hands.Hands(
-    min_detection_confidence=0.7, min_tracking_confidence=0.7, max_num_hands=2)
+    min_detection_confidence = 0.7,
+    min_tracking_confidence = 0.7,
+    max_num_hands = 2)
+
 cap = cv2.VideoCapture(0)
+
 while cap.isOpened():
   success, image = cap.read()
   image = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+
     
   if not success:
     print("Ignoring empty camera frame.")
     continue
+  
   image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
   image.flags.writeable = False
   results = hands.process(image)
@@ -27,11 +37,13 @@ while cap.isOpened():
   image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 #code starts here
-  counter=0
+  counter = 0
+  
   if results.multi_hand_landmarks: 
     if(results.multi_handedness[0].classification[0].label == "Left"): #if first hand on screen is left, right click is even
         right = 0
         left = 1
+        
     if(results.multi_handedness[0].classification[0].label == "Right"): #if first hand on screen is right, right click is odd
         right = 1
         left = 0
@@ -39,6 +51,7 @@ while cap.isOpened():
     #receive output from model    
     for hand_landmarks in results.multi_hand_landmarks:
       counter = counter + 1
+      
       # Index finger tip coordinates.
       indexRX = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x 
       indexRY = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].y 
@@ -55,30 +68,38 @@ while cap.isOpened():
       middleRZ = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].z
     
       #right hand code (every alternate iteration)
-      if(counter%2==right):
+      if(counter%2 == right):
+        if stoptracking.scroll(middleRX, middleRY, indexRX, indexRY):
+          direction = (indexRY-lastIndexY)
+          
+          if(direction>0 and abs(direction) > 0.005):
+            pyautogui.scroll(10)
+            
+          elif abs(direction) > 0.005:
+            pyautogui.scroll(-10)
+            
         if not stoptracking.stopTracking(indexRY, indexRX, thumbRY, thumbRX):
           mouse.moveTo(indexRX * width, indexRY * height, _pause = False)
-        
-      #left hand code (every alternate iteration)
-      if(counter%2==left) :
-        if(abs(indexRX-thumbRX) < 0.02 and abs(indexRY-thumbRY) < 0.04):
-          mouse.mouseDown(button = 'left')
-        else :
-          mouse.mouseUp(button = 'left')
 
-        if(abs(middleRX-thumbRX) < 0.02 and abs(middleRY-thumbRY) < 0.04):
-          mouse.mouseDown(button = 'right')
-        else :
-          mouse.mouseUp(button = 'right')
+      #left hand code (every alternate iteration)
+      if(counter%2 == left):
+        if(abs(indexRX-thumbRX) < 0.02 and abs(indexRY-thumbRY) < 0.04):
+          mouse.click(button = 'left')
+
+        elif(abs(middleRX-thumbRX) < 0.02 and abs(middleRY-thumbRY) < 0.04):
+          mouse.click(button = 'right')
             
-      #mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+      mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+      lastIndexX = indexRX
+      lastIndexY = indexRY
   
-  #cv2.imshow('MediaPipe Hands', image)
+  cv2.imshow('MediaPipe Hands', image)
   if cv2.waitKey(5) & 0xFF == 27:
     break
   
 hands.close()
 cap.release()
+
 
 #if(len(results.multi_handedness) > 1):
         #temp2 = results.multi_handedness[1]
@@ -88,4 +109,4 @@ cap.release()
          #         
       #if(temp.classification[0].label == "Right"):
        # print("GOTTEM")
-        #print(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width)  
+        #print(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width)
