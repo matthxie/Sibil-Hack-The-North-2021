@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import pyautogui
+import stoptracking
 
 mouse = pyautogui
 
@@ -57,24 +58,12 @@ while cap.isOpened():
     
       #right hand code (every alternate iteration)
       if(counter%2==right):
-        mouse.moveTo(hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * width, hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].y * height, _pause = False)
-        
+        if not stoptracking.stopTracking(indexRY, thumbRY):
+          mouse.moveTo(indexRX * width, indexRY * height, _pause = False)        
         
       #left hand code (every alternate iteration)
       if(counter%2==left):
         if(abs(indexRX-thumbRX) < 0.02 and abs(indexRY-thumbRY) < 0.04):
-          print(
-            f'Index Finger: '
-            f'{indexRX}, '
-            f'{indexRY}),'
-            f'{indexRZ}), '
-            '\n'
-
-            f'Thumb: '
-            f'{thumbRX}, '
-            f'{thumbRY}),'
-            f'{thumbRZ})'
-            '\n')
           mouse.click(button = 'left')
             
       mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
