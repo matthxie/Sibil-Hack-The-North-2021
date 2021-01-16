@@ -2,23 +2,28 @@ import cv2
 import mediapipe as mp
 import pyautogui
 import stoptracking
+import twofingerswiping
 
 mouse = pyautogui
 
 width, height = mouse.size()
 
-
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
+
+
+
 # For webcam input:
 hands = mp_hands.Hands(
     min_detection_confidence=0.7, min_tracking_confidence=0.7, max_num_hands=2)
 cap = cv2.VideoCapture(0)
+
+lastIndexX = 0
+lastIndexY = 0
+
 while cap.isOpened():
   success, image = cap.read()
-  image = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
-
-    
+  image = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)  
   if not success:
     print("Ignoring empty camera frame.")
     continue
@@ -55,11 +60,19 @@ while cap.isOpened():
       middleRX = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].x
       middleRY = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y 
       middleRZ = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].z
+
+      #print("index: " + str(indexRX) + ", " + str(indexRY) + "\nmiddle: " + str(middleRX) + ", " + str(middleRY))
     
       #right hand code (every alternate iteration)
       if(counter%2==right):
+        if twofingerswiping.scroll(middleRX, middleRY, indexRX, indexRY):
+          direction = (indexRY - lastIndexY)
+          print(str(direction))
+          direction = int(direction*height)
+          mouse.scroll(direction)
         if not stoptracking.stopTracking(indexRY, thumbRY):
-          mouse.moveTo(indexRX * width, indexRY * height, _pause = False)        
+          mouse.moveTo(indexRX * width, indexRY * height, _pause = False)
+        
         
       #left hand code (every alternate iteration)
       if(counter%2==left):
@@ -67,6 +80,8 @@ while cap.isOpened():
           mouse.click(button = 'left')
             
       mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+      lastIndexX = indexRX
+      lastIndexY = indexRY
   
   cv2.imshow('MediaPipe Hands', image)
   if cv2.waitKey(5) & 0xFF == 27:
