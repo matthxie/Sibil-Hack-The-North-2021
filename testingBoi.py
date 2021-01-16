@@ -76,6 +76,17 @@ cap = cv2.VideoCapture(0)
 success, image = cap.read()
 image = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
 
+
+success, image = cap.read()
+image = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+  
+image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
+image.flags.writeable = False
+results = hands.process(image)
+image.flags.writeable = True
+image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+
 process = threading.Thread(target = threadProcess)
 get = threading.Thread(target = threadGet)
 move = threading.Thread(target = threadMove)
