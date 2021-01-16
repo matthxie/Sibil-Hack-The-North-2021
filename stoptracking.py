@@ -1,5 +1,3 @@
-import math
-
-def stopTracking(indexY, thumbY):
-    if (math.fabs(indexY - thumbY) < 0.1):
+def stopTracking(middleY, wristY):
+    if (abs(middleY - wristY) < 0.2):
         return True
