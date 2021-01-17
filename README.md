@@ -1,4 +1,4 @@
-Run test.py to start the program. Doing so will utilize your webcam, so if you are using a 
+Run main.py to start the program. Doing so will utilize your webcam, so if you are using a 
 Windows computer please make sure that your webcam is not being used by other applications.
 
 There is currently no UI; starting and stopping has to be done from the Python shell or 
@@ -15,6 +15,6 @@ Pinching left middle and thumb will right click
 Pressing right index and middle together and then moving up and down will scroll depending on movement direction
 
 Spreading apart right index and middle will zoom in
-Touching right pinky to thumn will zoom in
+Touching right pinky to thumb will zoom out
 
-Pinching right index and thumb will stop the program from tracking until you release
+Pinching right index and thumb will stop the cursor from tracking your finger movements 
