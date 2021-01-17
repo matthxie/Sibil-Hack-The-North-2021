@@ -1,8 +1,8 @@
 import cv2
 import mediapipe as mp
 import pyautogui
-import stoptracking
-import twofingerswiping
+import gestures
+import keyboard
 
 mouse = pyautogui
 
@@ -11,6 +11,7 @@ width, height = mouse.size()
 
 lastIndexX = 0
 lastIndexY = 0
+
 
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
@@ -59,22 +60,38 @@ while cap.isOpened():
       middleRX = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].x
       middleRY = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y 
       middleRZ = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].z
-    
+        
+      ringRX = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP].x
+      ringRY = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP].y
+        
+      pinkyX = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_TIP].x
+
+
       #right hand code (every alternate iteration)
       if(counter%2==right):
-        if twofingerswiping.scroll(middleRX, middleRY, indexRX, indexRY):
-          direction = (indexRY-lastIndexY)                
-          if(direction>0 and abs(direction) > 0.005):
-            pyautogui.scroll(10)   
-          elif abs(direction) > 0.005:
-            pyautogui.scroll(-10)
-        if not stoptracking.stopTracking(indexRY, thumbRY):
+        if not gestures.stopTracking(indexRY, thumbRY):
           mouse.moveTo(indexRX * width, indexRY * height, _pause = False)
+          if gestures.scroll(middleRX, middleRY, indexRX, indexRY):
+            direction = (indexRY-lastIndexY)                
+            if(direction>0 and abs(direction) > 0.005):
+              pyautogui.scroll(10)   
+            elif abs(direction) > 0.005:
+              pyautogui.scroll(-10)
+          elif (abs(ringRX - thumbRX) > 0.075):
+            mouse.hotkey('command', '+')
+          elif (abs(pinkyX - thumbRX) < 0.05):
+            mouse.hotkey('command', '-')
+        
 
       #left hand code (every alternate iteration)
-      if(counter%2==left):
+      if(counter%2 == left):
         if(abs(indexRX-thumbRX) < 0.02 and abs(indexRY-thumbRY) < 0.04):
           mouse.click(button = 'left')
+
+        elif(abs(middleRX-thumbRX) < 0.02 and abs(middleRY-thumbRY) < 0.04):
+          mouse.click(button = 'right')
+        #if gestures.commandZoom(ringRY, ringRY, thumbRX, thumbRY):
+         #   keyboard.send('command+shift+=')
             
       mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
       lastIndexX = indexRX
