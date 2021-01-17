@@ -1,4 +1,4 @@
-Run main.py to start the program. Doing so will utilize your webcam, so if you are using a 
+Run test.py to start the program. Doing so will utilize your webcam, so if you are using a 
 Windows computer please make sure that your webcam is not being used by other applications.
 
 There is currently no UI; starting and stopping has to be done from the Python shell or 
