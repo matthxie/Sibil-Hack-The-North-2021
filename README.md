@@ -5,7 +5,7 @@ There is currently no UI; starting and stopping has to be done from the Python s
 whichever editor is being used.
 
 
-Gestures:
+##Gestures:
 
 Cursor follows your right index finger
 
